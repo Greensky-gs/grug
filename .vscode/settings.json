@@ -1,0 +1,5 @@
+{
+    "editor.wordWrap": "on",
+    "conventionalCommits.promptBody": false,
+    "conventionalCommits.promptFooter": false
+}
