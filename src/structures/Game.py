@@ -2,28 +2,47 @@ from characters import grug
 from characters import Player
 from structures.Character import Character
 from utils.config import configs
+from methods.parsers import parseDirection
+from methods.paths import Pathing
+from p5 import loadImage, image, text
 
 class Game:
     player: Player.Player
     grugSprite: grug.Grug
     mapIndex = 0
+    paths = Pathing()
+
+    # Système de cache pour les arrières-plans
+    bgCache = {}
 
     def __init__(self):
         self.player = Player.Player()
         self.grugSprite = grug.Grug(x = self.player.x, y = self.player.y)
 
+        self.player.moveTo(40, 716)
+        self.grugSprite.moveTo(*self.player.grugPos("right"))
+
     def movePlayer(self, *, x = 0, y = 0):
-        self.player.move(x, y)
+        self.player.move(x, y, self.paths)
         
-        lastDir = None
-        if x != 0:
-            lastDir = "left" if x < 0 else "right"
-        else:
-            lastDir = "up" if y < 0 else "down"
+        lastDir = parseDirection(x, y)
 
         self.grugSprite.setLastDirection(lastDir)
         self.grugSprite.moveTo(*self.player.grugPos(self.grugSprite.lastDirection))
 
+    def bgCaching(self):
+        if not self.mapIndex in self.bgCache:
+            bg = loadImage(f"./src/assets/map-{self.mapIndex}.jpg")
+            self.bgCache[self.mapIndex] = bg
+
+            return bg
+        return self.bgCache[self.mapIndex]    
+
     def display(self):
+        bg = self.bgCaching()
+        image(bg, 0, 0)
+
         self.grugSprite.display()
         self.player.display()
+
+        text(f"X: {self.player.x}, Y: {self.player.y}", 10, 10)

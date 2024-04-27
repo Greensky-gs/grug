@@ -1,6 +1,7 @@
 from p5 import *
 from utils.config import configs
 from methods.parsers import parsePos
+from methods.paths import Pathing
 
 class Player:
     x = 0
@@ -14,8 +15,15 @@ class Player:
     def __init__(self) -> None:
         pass
 
-    def move(self, x, y):
-        self.x, self.y = parsePos(self.x + x * self.deltaV, self.y + y * self.deltaV)
+    def move(self, x, y, paths: Pathing):
+        pos = parsePos(self.x + x * self.deltaV, self.y + y * self.deltaV)
+        if not paths.inPath(pos[0], pos[1]):
+            pos = paths.closest(pos[0], pos[1])
+
+            if abs(pos[0] - self.x) > 10 or abs(pos[1] - self.y) > 10:
+                pos = parsePos(self.x, self.y)
+
+        self.x, self.y = pos
 
     @property
     def pos(self):
@@ -30,3 +38,5 @@ class Player:
     def display(self):
         fill(255)
         rect(self.x, self.y, 10, 10)
+    def moveTo(self, x, y):
+        self.x, self.y = parsePos(x, y)
