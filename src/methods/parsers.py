@@ -11,3 +11,7 @@ def parseDirection(x, y) -> Literal["up", "down", "left", "right"]:
         lastDir = "up" if y < 0 else "down"
     
     return lastDir
+def horizontal(dir):
+    return dir in ["left", "right"]
+def vertical(dir):
+    return dir in ["up", "down"]

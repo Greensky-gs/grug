@@ -16,13 +16,22 @@ class Game:
     bgCache = {}
 
     def __init__(self):
+        pass
+    
+    def setup(self):
         self.player = Player.Player()
         self.grugSprite = grug.Grug(x = self.player.x, y = self.player.y)
 
         self.player.moveTo(40, 716)
         self.grugSprite.moveTo(*self.player.grugPos("right"))
 
-    def movePlayer(self, *, x = 0, y = 0):
+    def movePlayer(self, *, x = 0, y = 0, moving = False):
+        if moving:
+            self.player.setTextureState("walk")
+        else:
+            self.player.setTextureState("idle")
+        self.player.tickTexture()
+
         self.player.move(x, y, self.paths)
         
         lastDir = parseDirection(x, y)

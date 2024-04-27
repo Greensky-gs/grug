@@ -6,6 +6,7 @@ game = Game()
 
 def setup():
     size(configs["WIDTH"], configs["HEIGHT"])
+    game.setup()
 
 
 def draw():
@@ -29,9 +30,9 @@ def draw():
             xMov = 0 if not pressedKey in keysLeft + keysRight else (1 if pressedKey in keysRight else -1)
             yMov = 0 if not pressedKey in keysUp + keysDown else (-1 if pressedKey in keysUp else 1)
 
-        game.movePlayer(x = xMov, y = yMov)
-
-
+        game.movePlayer(x = xMov, y = yMov, moving=xMov!= 0 or yMov!= 0)
+    else:
+        game.player.setTextureState("idle")
     game.display()
 
 
