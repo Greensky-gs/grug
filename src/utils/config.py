@@ -1,5 +1,5 @@
 configs = {
-    "WIDTH": 1800,
-    "HEIGHT": 1200,
+    "WIDTH": 1500,
+    "HEIGHT": 900,
     "loadingTime": 200
 }
