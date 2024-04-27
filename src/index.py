@@ -7,11 +7,11 @@ game = Game()
 def setup():
     size(configs["WIDTH"], configs["HEIGHT"])
 
+
 def draw():
     resetMatrix()
     scale(1)
     background(0)
-    
 
     # Gère mouvements du joueur
     if key_is_pressed:
