@@ -9,14 +9,9 @@ def setup():
     size(configs["WIDTH"], configs["HEIGHT"])
     game.setup()
 
-initiated = False
-
 def draw():
-    global initiated
-
-    if not initiated:
-        sleep(3)
-        initiated = True
+    if not game.ready:
+        return
 
     resetMatrix()
     scale(1)
