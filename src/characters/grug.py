@@ -53,7 +53,6 @@ class Grug:
 
             if self.lastX == "left":
                 scale(-1, 1)
-            print(texture["timer"].count)
             img = texture["textures"][texture["timer"].count]
 
             image(img, -img.width // 2, -img.height)
