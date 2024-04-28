@@ -46,7 +46,7 @@ class Game:
 
     def bgCaching(self):
         if not self.mapIndex in self.bgCache:
-            bg = loadImage(f"./src/assets/map-{self.mapIndex}.jpg")
+            bg = loadImage(f"./src/assets/maps/{self.mapIndex}.jpg")
             self.bgCache[self.mapIndex] = bg
 
             return bg
