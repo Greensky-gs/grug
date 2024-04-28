@@ -40,7 +40,7 @@ class Player:
 
         self.textures["state"] = state
 
-    def move(self, x, y, paths: Pathing):
+    def move(self, x, y, *, paths: Pathing):
         pos = parsePos(self.x + x * self.deltaV, self.y + y * self.deltaV)
 
         if horizontal(parseDirection(x, y)):
