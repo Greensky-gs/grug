@@ -1,25 +1,69 @@
 from structures.Character import Character
 from p5 import *
 from typing import Literal
+from structures.Timer import Timer
+from pprint import pprint
 
 class Grug:
     name = "Grug"
     pos = [0, 0]
     pnj: Character
     lastDir: Literal["up", "down", "left", "right"] = None
+    lastX: Literal["left", "right"] = "right"
+
+    textures = {
+        "walk": {
+            "timer": Timer(23),
+            "textures": []
+        },
+        "idle": {
+            "timer": Timer(17),
+            "textures": []
+        },
+        "state": "idle"
+    }
 
     def __init__(self, *, x, y) -> None:
         self.pos = [x, y]
         self.pnj = Character(x = self.pos[0], y = self.pos[1], name = self.name)
 
+        # Chargement des textures
+        for i in range(1, 24):
+            txtI = str(i).zfill(3)
+
+            self.textures["walk"]["textures"].append(loadImage(f"./src/assets/sprites/grug/walk/0_Ogre_Walking_{txtI}.png"))
+            if i <= 17:
+                self.textures["idle"]["textures"].append(loadImage(f"./src/assets/sprites/grug/idle/0_Ogre_Idle_{txtI}.png"))
+
         # La fonction d'affichage de grug
         def drawer(x, y):
-            fill(255, 0, 0)
-            rect(x, y, 10, 10)
+            texture = self.textures[self.textures["state"]]
+            texture["timer"].tick()
+
+            pushMatrix()
+
+            translate(x, y)
+
+            if self.lastX == "left":
+                scale(-1, 1)
+            img = texture["textures"][texture["timer"].count]
+
+            image(img, -img.width // 2, -img.height)
+
+            popMatrix()
         self.pnj.setDrawer(drawer)
 
+    def setLastX(self, lastX):
+        self.lastX = lastX
     def display(self):
         self.pnj.display()
+
+    def setTextureState(self, state):
+        if self.textures["state"] == state:
+            return
+    
+        self.textures[self.textures["state"]]["timer"].reset()
+        self.textures["state"] = state
 
     def moveTo(self, x, y):
         self.pnj.setPos(x, y)

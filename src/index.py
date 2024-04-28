@@ -1,6 +1,7 @@
 from utils.config import configs
 from p5 import *
 from structures.Game import Game
+from time import sleep
 
 game = Game()
 
@@ -8,8 +9,15 @@ def setup():
     size(configs["WIDTH"], configs["HEIGHT"])
     game.setup()
 
+initiated = False
 
 def draw():
+    global initiated
+
+    if not initiated:
+        sleep(3)
+        initiated = True
+
     resetMatrix()
     scale(1)
     background(0)
@@ -32,6 +40,7 @@ def draw():
 
         game.movePlayer(x = xMov, y = yMov, moving=xMov!= 0 or yMov!= 0)
     else:
+        game.grugSprite.setTextureState("idle")
         game.player.setTextureState("idle")
     game.display()
 

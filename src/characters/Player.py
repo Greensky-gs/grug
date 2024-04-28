@@ -9,7 +9,7 @@ class Player:
     y = 0
 
     deltaV = 4
-    deltaGrug = 7
+    deltaGrug = 30
     jumping: float = 0 # de 0 à 1 pour faire un coefficient
     shifting = False
 

@@ -2,9 +2,9 @@ from characters import grug
 from characters import Player
 from structures.Character import Character
 from utils.config import configs
-from methods.parsers import parseDirection
+from methods.parsers import parseDirection, horizontal
 from methods.paths import Pathing
-from p5 import loadImage, image, text
+from p5 import loadImage, image
 
 class Game:
     player: Player.Player
@@ -28,14 +28,19 @@ class Game:
     def movePlayer(self, *, x = 0, y = 0, moving = False):
         if moving:
             self.player.setTextureState("walk")
+            self.grugSprite.setTextureState("walk")
         else:
             self.player.setTextureState("idle")
+            self.grugSprite.setTextureState("idle")
+
         self.player.tickTexture()
 
         self.player.move(x, y, self.paths)
         
         lastDir = parseDirection(x, y)
 
+        if horizontal(lastDir):
+            self.grugSprite.setLastX(lastDir)
         self.grugSprite.setLastDirection(lastDir)
         self.grugSprite.moveTo(*self.player.grugPos(self.grugSprite.lastDirection))
 
@@ -53,5 +58,3 @@ class Game:
 
         self.grugSprite.display()
         self.player.display()
-
-        text(f"X: {self.player.x}, Y: {self.player.y}", 10, 10)
