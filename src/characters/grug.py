@@ -20,7 +20,8 @@ class Grug:
             "timer": Timer(17),
             "textures": []
         },
-        "state": "idle"
+        "state": "idle",
+        "ticker": Timer(3)
     }
 
     def __init__(self, *, x, y) -> None:
@@ -38,7 +39,13 @@ class Grug:
         # La fonction d'affichage de grug
         def drawer(x, y):
             texture = self.textures[self.textures["state"]]
-            texture["timer"].tick()
+    
+            self.textures["ticker"].tick()
+            if self.textures["state"] == "idle":
+                if self.textures["ticker"].valid:
+                    texture["timer"].tick()
+            else:
+                texture["timer"].tick()
 
             pushMatrix()
 
@@ -46,6 +53,7 @@ class Grug:
 
             if self.lastX == "left":
                 scale(-1, 1)
+            print(texture["timer"].count)
             img = texture["textures"][texture["timer"].count]
 
             image(img, -img.width // 2, -img.height)
