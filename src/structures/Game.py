@@ -4,8 +4,9 @@ from structures.Character import Character
 from utils.config import configs
 from methods.parsers import parseDirection, horizontal
 from methods.paths import Pathing
-from p5 import loadImage, image, text
+from p5 import loadImage, image, fill, rect, resetMatrix, background
 from os import listdir
+from time import monotonic
 
 class Game:
     player: Player.Player
@@ -17,9 +18,13 @@ class Game:
         "triggers": Pathing(f"./src/data/triggers.json", 1)
     }
     ready = False
+    paused = False
+    tickerRef: int
 
     # Système de cache pour les arrières-plans
     bgCache = {}
+    _cache = {}
+    frameRate: int
 
     def __init__(self):
         pass
@@ -35,12 +40,30 @@ class Game:
             name = file.split(".")[0]
             self.bgCache[name] = loadImage(f"./src/assets/bg/{name}.jpg")
 
+        self.tickerRef = monotonic()
         self.ready = True
+
+    def pause(self):
+        self.paused = True
+        self.cache("pauseTick", self.tick)
+    def resume(self):
+        self.paused = False
+        self.cache("pauseTick", self.tick)
 
     def setBgIndex(self, name):
         self.bgIndex = name
     def resetBgIndex(self):
         self.bgIndex = None
+
+    def cache(self, name, value = None):
+        if value is None:
+            if name in self._cache:
+                self._cache.pop(name)
+            return self._cache
+        self._cache[name] = value
+        return value
+    def getcache(self, name, default = None):
+        return self._cache.get(name, default)
 
     def movePlayer(self, *, x = 0, y = 0, moving = False):
         if moving:
@@ -77,12 +100,29 @@ class Game:
 
             self.setBgIndex(scene)
 
+    def pauseScreen(self):
+        self.grugSprite.display()
+        self.player.display()
+
+        fill(200, 200, 200, 200)
+        rect(0, 0, configs["WIDTH"], configs["HEIGHT"])
     def display(self):
+        resetMatrix()
+        background(0)
+
         bg = self.bgCaching()
         image(bg, 0, 0)
+
+        if self.paused:
+            self.pauseScreen()
+            return
 
         self.grugSprite.display()
         self.player.display()
 
         self.checkTriggers()
 
+    @property
+    def tick(self):
+        now = monotonic()
+        return now - self.tickerRef

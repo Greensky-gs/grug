@@ -1,21 +1,17 @@
 from utils.config import configs
 from p5 import *
 from structures.Game import Game
-from time import sleep
 
 game = Game()
 
 def setup():
     size(configs["WIDTH"], configs["HEIGHT"])
+
     game.setup()
 
 def draw():
     if not game.ready:
         return
-
-    resetMatrix()
-    scale(1)
-    background(0)
 
     # Gère mouvements du joueur
     if key_is_pressed:
@@ -27,13 +23,27 @@ def draw():
 
         pressedKey = str(key).lower()
 
+        if pressedKey == "backspace":
+            pauseTick = game.getcache('pauseTick')
+            if pauseTick is None:
+                game.pause()
+                return
+            else:
+                if game.tick - pauseTick >= 1:
+                    if game.paused:
+                        game.resume()
+                    else:
+                        game.pause()
+                    return
+
         xMov = 0
         yMov = 0
         if pressedKey in combined:
             xMov = 0 if not pressedKey in keysLeft + keysRight else (1 if pressedKey in keysRight else -1)
             yMov = 0 if not pressedKey in keysUp + keysDown else (-1 if pressedKey in keysUp else 1)
 
-        game.movePlayer(x = xMov, y = yMov, moving=xMov!= 0 or yMov!= 0)
+        if not game.paused:
+            game.movePlayer(x = xMov, y = yMov, moving=xMov!= 0 or yMov!= 0)
     else:
         game.grugSprite.setTextureState("idle")
         game.player.setTextureState("idle")
