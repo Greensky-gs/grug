@@ -1,5 +1,5 @@
 from p5 import *
-from utils.config import configs
+from utils.config import renderModes, dev
 from methods.parsers import parsePos, parseDirection, horizontal
 from methods.paths import Pathing
 from structures.Timer import Timer
@@ -9,7 +9,8 @@ class Player:
     y = 0
 
     deltaV = 4
-    deltaGrug = 30
+    deltaSprint = 2 * deltaV
+    deltaGrug = 45
     jumping: float = 0 # de 0 à 1 pour faire un coefficient
     shifting = False
 
@@ -22,14 +23,21 @@ class Player:
             "counter": Timer(1),
             "textures": []
         },
+        "sprint": {
+            "counter": Timer(8),
+            "textures": []
+        },
         "state": "idle"
     }
     lastDir = "right"
 
     def __init__(self) -> None:
         for i in range(8):
-            img = loadImage(f"./src/assets/sprites/player/walk/{i}.png")
-            self.textures["walk"]["textures"].append(img)
+            walk = loadImage(f"./src/assets/sprites/player/walk/{i}.png")
+            self.textures["walk"]["textures"].append(walk)
+
+            sprint = loadImage(f"./src/assets/sprites/player/sprint/{i}.png")
+            self.textures["sprint"]["textures"].append(sprint)
         self.textures["idle"]["textures"].append(loadImage("./src/assets/sprites/player/idle/0.png"))
             
     def setTextureState(self, state):
@@ -40,8 +48,11 @@ class Player:
 
         self.textures["state"] = state
 
+    @property
+    def delta(self):
+        return self.deltaSprint if self.textures["state"] == "sprint" else self.deltaV
     def move(self, x, y, *, paths: Pathing):
-        pos = parsePos(self.x + x * self.deltaV, self.y + y * self.deltaV)
+        pos = parsePos(self.x + x * self.delta, self.y + y * self.delta)
 
         if horizontal(parseDirection(x, y)):
             self.lastDir = parseDirection(x, y)
@@ -66,20 +77,26 @@ class Player:
     def tickTexture(self):
         self.textures[self.textures["state"]]["counter"].tick()
 
+
+    def hitbox(self, w, h):
+        fill(255)
+        rect(self.x, self.y, w, h)
     def display(self):
         texture = self.textures[self.textures["state"]]
+        img = texture["textures"][texture["counter"].count]
+
+        if dev:
+            self.hitbox(img.width, -img.height)
 
         pushMatrix()
 
-        height = 60
-        width = 20
-
         translate(self.x, self.y)
 
+        coef = 0
         if self.lastDir == "left":
             scale(-1, 1)
-
-        image(texture["textures"][texture["counter"].count], -width, -height)
+            coef = -1
+        image(img, img.width * coef, -img.height)
 
         popMatrix()
 

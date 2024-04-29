@@ -3,6 +3,7 @@ from p5 import *
 from typing import Literal
 from structures.Timer import Timer
 from pprint import pprint
+from utils.config import dev
 
 class Grug:
     name = "Grug"
@@ -47,15 +48,23 @@ class Grug:
             else:
                 texture["timer"].tick()
 
+            img = texture["textures"][texture["timer"].count]
+
+            if dev:
+                print("dev")
+                fill(255)
+                rect(self.pos[0], self.pos[1], img.width, -img.height)
+            
             pushMatrix()
 
             translate(x, y)
 
+            coef = 0
             if self.lastX == "left":
+                coef = -1
                 scale(-1, 1)
-            img = texture["textures"][texture["timer"].count]
 
-            image(img, -img.width // 2, -img.height)
+            image(img, coef * img.width, -img.height)
 
             popMatrix()
         self.pnj.setDrawer(drawer)

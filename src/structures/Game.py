@@ -54,10 +54,12 @@ class Game:
         self.bgIndex = name
         self.collisions["ground"] = Pathing(f"./src/data/scenes/{name}.json", paths.Grounds)
         self.render = renderModes.FACE
+        self.player.setTextureState("sprint")
     def resetBgIndex(self):
         self.bgIndex = None
         self.collisions.pop("ground")
         self.render = renderModes.UP
+        self.player.setTextureState("idle")
 
     def cache(self, name, value = None):
         if value is None:
@@ -71,7 +73,7 @@ class Game:
 
     def movePlayer(self, *, x = 0, y = 0, moving = False):
         if moving:
-            self.player.setTextureState("walk")
+            self.player.setTextureState(self.playerMoveTexture)
             self.grugSprite.setTextureState("walk")
         else:
             self.player.setTextureState("idle")
@@ -131,3 +133,7 @@ class Game:
     def tick(self):
         now = monotonic()
         return now - self.tickerRef
+    
+    @property
+    def playerMoveTexture(self):
+        return "walk" if self.render == renderModes.UP else "sprint"
