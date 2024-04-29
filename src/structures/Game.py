@@ -1,7 +1,6 @@
 from characters import grug
 from characters import Player
-from structures.Character import Character
-from utils.config import configs
+from utils.config import configs, renderModes, paths
 from methods.parsers import parseDirection, horizontal
 from methods.paths import Pathing
 from p5 import loadImage, image, fill, rect, resetMatrix, background
@@ -14,12 +13,13 @@ class Game:
     mapIndex = 0
     bgIndex = None
     collisions = {
-        "paths": Pathing(f"./src/data/paths.json", 0),
-        "triggers": Pathing(f"./src/data/triggers.json", 1)
+        "paths": Pathing(f"./src/data/paths.json", paths.Paths),
+        "triggers": Pathing(f"./src/data/triggers.json", paths.Colliders)
     }
     ready = False
     paused = False
     tickerRef: int
+    render = renderModes.UP
 
     # Système de cache pour les arrières-plans
     bgCache = {}
@@ -52,8 +52,12 @@ class Game:
 
     def setBgIndex(self, name):
         self.bgIndex = name
+        self.collisions["ground"] = Pathing(f"./src/data/scenes/{name}.json", paths.Grounds)
+        self.render = renderModes.FACE
     def resetBgIndex(self):
         self.bgIndex = None
+        self.collisions.pop("ground")
+        self.render = renderModes.UP
 
     def cache(self, name, value = None):
         if value is None:
@@ -75,7 +79,7 @@ class Game:
 
         self.player.tickTexture()
 
-        self.player.move(x, y, paths=self.collisions["paths"])
+        self.player.move(x, y, paths=self.collisions["paths" if self.render == renderModes.UP else "ground"])
         
         lastDir = parseDirection(x, y)
 
@@ -117,7 +121,8 @@ class Game:
             self.pauseScreen()
             return
 
-        self.grugSprite.display()
+        if self.render == renderModes.UP:
+            self.grugSprite.display()
         self.player.display()
 
         self.checkTriggers()
