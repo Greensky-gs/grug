@@ -1,3 +1,5 @@
+from sys import argv
+
 configs = {
     "WIDTH": 1500,
     "HEIGHT": 900,
@@ -15,3 +17,5 @@ class PathModes:
     Colliders = 1
     Grounds = 2
 paths = PathModes()
+
+dev = "--dev" in argv
