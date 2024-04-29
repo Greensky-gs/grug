@@ -51,6 +51,7 @@ class Grug:
             img = texture["textures"][texture["timer"].count]
 
             if dev:
+                print("dev")
                 fill(255)
                 rect(self.pos[0], self.pos[1], img.width, -img.height)
             
