@@ -55,11 +55,17 @@ class Game:
         self.collisions["ground"] = Pathing(f"./src/data/scenes/{name}.json", paths.Grounds)
         self.render = renderModes.FACE
         self.player.setTextureState("sprint")
+
+        self.cache("beforeCollide", self.player.pos)
+        self.player.moveTo(20, self.collisions["ground"].closest(self.player.x, self.player.y)[1])
     def resetBgIndex(self):
         self.bgIndex = None
         self.collisions.pop("ground")
         self.render = renderModes.UP
         self.player.setTextureState("idle")
+
+        self.player.moveTo(*self.getcache("beforeCollide"))
+        self.cache("beforeCollide")
 
     def cache(self, name, value = None):
         if value is None:

@@ -21,6 +21,7 @@ class Grug:
             "timer": Timer(17),
             "textures": []
         },
+        "hat": None,
         "state": "idle",
         "ticker": Timer(3)
     }
@@ -33,6 +34,7 @@ class Grug:
         for i in range(1, 24):
             txtI = str(i).zfill(3)
 
+            self.textures["hat"] = loadImage("./src/assets/hats/haut_forme.png")
             self.textures["walk"]["textures"].append(loadImage(f"./src/assets/sprites/grug/walk/0_Ogre_Walking_{txtI}.png"))
             if i <= 17:
                 self.textures["idle"]["textures"].append(loadImage(f"./src/assets/sprites/grug/idle/0_Ogre_Idle_{txtI}.png"))
@@ -65,6 +67,8 @@ class Grug:
                 scale(-1, 1)
 
             image(img, coef * img.width, -img.height)
+            hat = self.textures["hat"]
+            image(hat, coef * hat.width, -img.height - hat.height / 2.5)
 
             popMatrix()
         self.pnj.setDrawer(drawer)
