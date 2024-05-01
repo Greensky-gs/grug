@@ -3,6 +3,7 @@ from characters import Player
 from utils.config import configs, renderModes, paths
 from methods.parsers import parseDirection, horizontal
 from methods.paths import Pathing
+from structures.Timer import Timer
 from p5 import loadImage, image, fill, rect, resetMatrix, background
 from os import listdir
 from time import monotonic
@@ -76,17 +77,22 @@ class Game:
         return value
     def getcache(self, name, default = None):
         return self._cache.get(name, default)
+    def startJump(self):
+        self.player.setTextureState("jump")
+        self.player.jumping = True
+        self.cache("jumpTick", self.tick)
 
     def movePlayer(self, *, x = 0, y = 0, moving = False):
-        if moving:
-            self.player.setTextureState(self.playerMoveTexture)
-            self.grugSprite.setTextureState("walk")
-        else:
-            self.player.setTextureState("idle")
-            self.grugSprite.setTextureState("idle")
+        if not self.player.jumping:
+            if moving:
+                self.player.setTextureState(self.playerMoveTexture)
+                self.grugSprite.setTextureState("walk")
+            else:
+                self.player.setTextureState("idle")
+                self.grugSprite.setTextureState("idle")
 
-        self.player.tickTexture()
-
+        if self.render == renderModes.FACE:
+            y = 0
         self.player.move(x, y, paths=self.collisions["paths" if self.render == renderModes.UP else "ground"])
         
         lastDir = parseDirection(x, y)
@@ -119,6 +125,8 @@ class Game:
         fill(200, 200, 200, 200)
         rect(0, 0, configs["WIDTH"], configs["HEIGHT"])
     def display(self):
+        self.player.tickTexture()
+
         resetMatrix()
         background(0)
 
@@ -131,6 +139,9 @@ class Game:
 
         if self.render == renderModes.UP:
             self.grugSprite.display()
+        if self.render == renderModes.FACE:
+            if self.player.jumping:
+                self.player.addJump(self.getcache("jumpTick"), self.tick, self.collisions["ground"].closest(self.player.x, self.player.y)[1])
         self.player.display()
 
         self.checkTriggers()

@@ -3,6 +3,7 @@ from utils.config import renderModes, dev
 from methods.parsers import parsePos, parseDirection, horizontal
 from methods.paths import Pathing
 from structures.Timer import Timer
+from math import sin, pi, exp
 
 class Player:
     x = 0
@@ -10,8 +11,9 @@ class Player:
 
     deltaV = 4
     deltaSprint = 2 * deltaV
+    deltaJump = 90
     deltaGrug = 45
-    jumping: float = 0 # de 0 à 1 pour faire un coefficient
+    jumping: bool = False
     shifting = False
 
     textures = {
@@ -27,6 +29,10 @@ class Player:
             "counter": Timer(8),
             "textures": []
         },
+        "jump": {
+            "counter": Timer(1),
+            "textures": []
+        },
         "state": "idle"
     }
     lastDir = "right"
@@ -38,6 +44,8 @@ class Player:
 
             sprint = loadImage(f"./src/assets/sprites/player/sprint/{i}.png")
             self.textures["sprint"]["textures"].append(sprint)
+
+        self.textures["jump"]["textures"].append(loadImage("./src/assets/sprites/player/jump/0.png"))
         self.textures["idle"]["textures"].append(loadImage("./src/assets/sprites/player/idle/0.png"))
             
     def setTextureState(self, state):
@@ -74,6 +82,23 @@ class Player:
             self.x + (self.deltaGrug if direction == "left" else -self.deltaGrug if direction == "right" else 0),
             self.y + (self.deltaGrug if direction == "up" else -self.deltaGrug if direction == "down" else 0)
         ]
+    def addJump(self, startTick, currentTick, c):
+        absis = (currentTick - startTick)
+        
+        # Amplitude du saut
+        a = 0.4
+        # Période du saut (longueur/durée)
+        t = 1.3
+        # Vitesse de décroissance
+        l = -1.1
+
+        jump = lambda x: (a * sin((pi * x)/t) * exp(-l * x))
+
+        y = min(jump(absis) * self.deltaJump * -1, 0)
+
+        if y >= 0 and startTick != currentTick:
+            self.jumping = False
+        self.y = y + c
     def tickTexture(self):
         self.textures[self.textures["state"]]["counter"].tick()
 
@@ -87,7 +112,6 @@ class Player:
 
         if dev:
             self.hitbox(img.width, -img.height)
-
         pushMatrix()
 
         translate(self.x, self.y)

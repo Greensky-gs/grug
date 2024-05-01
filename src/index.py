@@ -1,4 +1,4 @@
-from utils.config import configs
+from utils.config import configs, renderModes
 from p5 import *
 from structures.Game import Game
 
@@ -44,9 +44,13 @@ def draw():
 
         if not game.paused:
             game.movePlayer(x = xMov, y = yMov, moving=xMov!= 0 or yMov!= 0)
+        if game.render == renderModes.FACE:
+            if pressedKey in keysUp + ["space"] and not game.player.jumping:
+                game.startJump()
     else:
-        game.grugSprite.setTextureState("idle")
-        game.player.setTextureState("idle")
+        if not game.player.jumping:
+            game.grugSprite.setTextureState("idle")
+            game.player.setTextureState("idle")
     game.display()
 
 
