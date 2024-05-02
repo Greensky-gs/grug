@@ -45,7 +45,7 @@ def draw():
         if not game.paused:
             game.movePlayer(x = xMov, y = yMov, moving=xMov!= 0 or yMov!= 0)
         if game.render == renderModes.FACE:
-            if pressedKey in keysUp + ["space"] and not game.player.jumping:
+            if pressedKey in keysUp + [" "] and not game.player.jumping:
                 game.startJump()
     else:
         if not game.player.jumping:
