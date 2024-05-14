@@ -1,12 +1,14 @@
 from characters import grug
 from characters import Player
-from utils.config import configs, renderModes, paths
+from utils.config import configs, renderModes, paths, dev
 from methods.parsers import parseDirection, horizontal
 from methods.paths import Pathing
 from structures.Timer import Timer
 from p5 import loadImage, image, fill, rect, resetMatrix, background
 from os import listdir
 from time import monotonic
+from structures.BossManager import Bosses
+from pprint import pprint
 
 class Game:
     player: Player.Player
@@ -21,6 +23,7 @@ class Game:
     paused = False
     tickerRef: int
     render = renderModes.UP
+    bosses = Bosses()
 
     # Système de cache pour les arrières-plans
     bgCache = {}
@@ -42,16 +45,29 @@ class Game:
             self.bgCache[name] = loadImage(f"./src/assets/bg/{name}.jpg")
 
         self.tickerRef = monotonic()
+        self.bosses.load()
         self.ready = True
 
+        if dev:
+            self.setBgIndex("truck")
+           
     def pause(self):
         self.paused = True
         self.cache("pauseTick", self.tick)
     def resume(self):
         self.paused = False
-        self.cache("pauseTick", self.tick)
+        self.cache("pauseTick")
 
     def setBgIndex(self, name):
+        if name is None:
+            self.cache("boss")
+        
+        boss = self.bosses.getBoss(name)
+        if not boss:
+            return
+        
+        self.cache("boss", boss)
+
         self.bgIndex = name
         self.collisions["ground"] = Pathing(f"./src/data/scenes/{name}.json", paths.Grounds)
         self.render = renderModes.FACE
@@ -140,6 +156,10 @@ class Game:
         if self.render == renderModes.UP:
             self.grugSprite.display()
         if self.render == renderModes.FACE:
+            boss = self.getcache("boss")
+            if not not boss:
+                boss.displayer()
+
             if self.player.jumping:
                 self.player.addJump(self.getcache("jumpTick"), self.tick, self.collisions["ground"].closest(self.player.x, self.player.y)[1])
         self.player.display()
