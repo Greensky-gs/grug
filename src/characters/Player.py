@@ -11,7 +11,8 @@ class Player:
 
     deltaV = 4
     deltaSprint = 2 * deltaV
-    deltaJump = 90
+    deltaSpeedJump = 1.4 * deltaSprint
+    deltaJump = 170
     deltaGrug = 45
     jumping: bool = False
     shifting = False
@@ -58,7 +59,7 @@ class Player:
 
     @property
     def delta(self):
-        return self.deltaSprint if self.textures["state"] == "sprint" else self.deltaV
+        return self.deltaSprint if self.textures["state"] == "sprint" else self.deltaSpeedJump if self.jumping else self.deltaV
     def move(self, x, y, *, paths: Pathing):
         pos = parsePos(self.x + x * self.delta, self.y + y * self.delta)
 
@@ -86,9 +87,9 @@ class Player:
         absis = (currentTick - startTick)
         
         # Amplitude du saut
-        a = 0.4
+        a = 0.7
         # Période du saut (longueur/durée)
-        t = 1.3
+        t = 0.8
         # Vitesse de décroissance
         l = -1.1
 

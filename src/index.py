@@ -51,6 +51,10 @@ def draw():
         if not game.player.jumping:
             game.grugSprite.setTextureState("idle")
             game.player.setTextureState("idle")
+    
+    if mouse_is_pressed:
+        if game.render == renderModes.FACE and not game.player.jumping:
+            game.startJump()
     game.display()
 
 
