@@ -158,6 +158,8 @@ class Game:
         if self.render == renderModes.FACE:
             boss = self.getcache("boss")
             if not not boss:
+                boss.hpBar()
+
                 boss.move(self.player, self.tick)
                 boss.displayer()
 

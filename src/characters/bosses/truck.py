@@ -40,6 +40,23 @@ class Truck(Boss):
             popMatrix()
 
         self.setdisplay(display)
+    def hpBar(self):
+        width = 320
+        outline = 5
+        height = 15
+
+        ox = 10
+        oy = 10
+
+        noStroke()
+        fill(0)
+        rect(ox, oy, width + outline * 2, height + outline * 2)
+
+        fill(125)
+        rect(ox + outline, oy + outline, width, height)
+
+        fill(255, 0, 0)
+        rect(ox + outline, oy + outline, max(0, width * (self.hp[0] / self.hp[1])), height)
     def move(self, player: Player, tick: int):
         self.setPos(player, tick)
         self.pos = parsePos(*self.pos, aw=self.width)
