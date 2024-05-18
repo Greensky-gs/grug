@@ -17,6 +17,8 @@ class Player:
     jumping: bool = False
     shifting = False
 
+    hp = [50, 50]
+
     textures = {
         "walk": {
             "counter": Timer(8),
@@ -57,6 +59,23 @@ class Player:
 
         self.textures["state"] = state
 
+    def hpBar(self):
+        ox = 33
+        oy = 789
+
+        width = 270
+        height = 10
+        outline = 2
+
+        noStroke()
+        fill(0)
+        rect(ox, oy, width + outline * 2, height + outline * 2)
+
+        fill(125)
+        rect(ox + outline, oy + outline, width, height)
+
+        fill(6, 180, 59)
+        rect(ox + outline, oy + outline, max(0, width * (self.hp[0] / self.hp[1])), height)
     @property
     def delta(self):
         return self.deltaSprint if self.textures["state"] == "sprint" else self.deltaSpeedJump if self.jumping else self.deltaV
@@ -124,6 +143,8 @@ class Player:
         image(img, img.width * coef, -img.height)
 
         popMatrix()
+
+        self.hpBar()
 
     def moveTo(self, x, y):
         self.x, self.y = parsePos(x, y)
