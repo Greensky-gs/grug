@@ -56,7 +56,7 @@ class Game:
         self.cache("pauseTick", self.tick)
     def resume(self):
         self.paused = False
-        self.cache("pauseTick")
+        self.cache("pauseTick", self.tick)
 
     def setBgIndex(self, name):
         if name is None:
