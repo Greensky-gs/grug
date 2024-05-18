@@ -28,3 +28,10 @@ class Boss:
     def damage(self, amount):
         self.hp[0] = max(self.hp[0] - amount, 0)
         return self.dead
+
+    @property
+    def x(self):
+        return self.pos[0]
+    @property
+    def y(self):
+        return self.pos[1]

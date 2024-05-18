@@ -16,6 +16,7 @@ class Player:
     deltaGrug = 45
     jumping: bool = False
     shifting = False
+    dimens = [0, 0]
 
     hp = [50, 50]
 
@@ -105,15 +106,10 @@ class Player:
             self.x + (self.deltaGrug if direction == "left" else -self.deltaGrug if direction == "right" else 0),
             self.y + (self.deltaGrug if direction == "up" else -self.deltaGrug if direction == "down" else 0)
         ]
-    def addJump(self, startTick, currentTick, c):
+    def addJump(self, startTick, currentTick, c, coefs = [0.7, 0.8, -1.1]):
         absis = (currentTick - startTick)
-        
-        # Amplitude du saut
-        a = 0.7
-        # Période du saut (longueur/durée)
-        t = 0.8
-        # Vitesse de décroissance
-        l = -1.1
+
+        a, t, l = coefs
 
         jump = lambda x: (a * sin((pi * x)/t) * exp(-l * x))
 
@@ -128,9 +124,17 @@ class Player:
     def hitbox(self, w, h):
         fill(255)
         rect(self.x, self.y, w, h)
+    def damage(self, amount):
+        self.hp[0] = max(self.hp[0] - amount, 0)
+        return self.dead
+    @property
+    def dead(self):
+        return self.hp[0] <= 0
     def display(self):
         texture = self.textures[self.textures["state"]]
         img = texture["textures"][texture["counter"].count]
+
+        self.dimens = [img.width, img.height]
 
         if dev:
             self.hitbox(img.width, -img.height)
@@ -148,3 +152,9 @@ class Player:
 
     def moveTo(self, x, y):
         self.x, self.y = parsePos(x, y)
+    @property
+    def width(self):
+        return self.dimens[0]
+    @property
+    def height(self):
+        return self.dimens[1]

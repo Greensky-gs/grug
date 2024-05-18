@@ -1,7 +1,7 @@
 from characters import grug
 from characters import Player
 from utils.config import configs, renderModes, paths, dev
-from methods.parsers import parseDirection, horizontal
+from methods.parsers import parseDirection, horizontal, checkCollision
 from methods.paths import Pathing
 from structures.Timer import Timer
 from p5 import loadImage, image, fill, rect, resetMatrix, background
@@ -95,8 +95,10 @@ class Game:
         return value
     def getcache(self, name, default = None):
         return self._cache.get(name, default)
-    def startJump(self):
+    def startJump(self, coefs = None):
         self.player.setTextureState("jump")
+        self.cache("jumpCoefs", coefs)
+
         self.player.jumping = True
         self.cache("jumpTick", self.tick)
 
@@ -162,11 +164,15 @@ class Game:
             if not not boss:
                 boss.hpBar()
 
-                boss.move(self.player, self.tick)
+                boss.move(self.player, self, self.tick)
                 boss.displayer()
 
             if self.player.jumping:
-                self.player.addJump(self.getcache("jumpTick"), self.tick, self.collisions["ground"].closest(self.player.x, self.player.y)[1])
+                coefs = self.getcache("jumpCoefs")
+                if coefs is None:
+                    self.player.addJump(self.getcache("jumpTick"), self.tick, self.collisions["ground"].closest(self.player.x, self.player.y)[1])
+                else:
+                    self.player.addJump(self.getcache("jumpTick"), self.tick, self.collisions["ground"].closest(self.player.x, self.player.y)[1], coefs)
             self.player.hpBar()
         self.player.display()
 

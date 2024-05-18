@@ -4,7 +4,7 @@ from characters.Player import Player
 from structures.Timer import Timer
 from typing import Any
 from utils.config import configs, dev
-from methods.parsers import parseDirection, parsePos
+from methods.parsers import parseDirection, parsePos, checkCollision
 from p5 import *
 from random import randint
 
@@ -66,17 +66,18 @@ class Truck(Boss):
 
         fill(255, 0, 0)
         rect(ox + outline, oy + outline, max(0, width * (self.hp[0] / self.hp[1])), height)
-    def move(self, player: Player, tick: int):
-        self.setPos(player, tick)
+    def move(self, player: Player, game, tick: int):
+        self.setPos(player, game, tick)
         self.pos = parsePos(*self.pos, aw=self.width)
 
         return self.pos
-    def setPos(self, player: Player, tick: int):
+    def setPos(self, player: Player, game, tick: int):
         def clearCache():
             self.cache.delete("target")
             self.cache.delete("tick")
             self.cache.delete("timeout")
             self.cache.delete("operand")
+            self.cache.delete("damager")
 
         if self.cache.get("waiting"):
             if tick - self.cache.get("waiting") < 1.3:
@@ -97,6 +98,9 @@ class Truck(Boss):
 
             self.cache.cache("tick", tick)
             self.cache.cache("timeout", randint(10, 20) / 10)
+            self.cache.cache("damager", Timer(45))
+
+            self.cache.get("damager").setTick(43)
         else:
             start = self.cache.get("tick")
             target = self.cache.get("target")
@@ -109,6 +113,13 @@ class Truck(Boss):
                 self.pos = (self.pos[0] + 20 * coef, self.pos[1])
             
             self.lastDir = parseDirection(coef, 0)
+
+            if checkCollision(oxa=self.x, oya=self.y, oxb=player.x, oyb=player.y, wa=self.width, ha=self.height, wb=player.width, hb=player.height):
+                self.cache.get("damager").tick()
+                if self.cache.get("damager").valid:
+                    player.damage(3)
+                    game.startJump([2.6, 0.8, 1.7])
+
         if eval(f"{self.pos[0]} {self.cache.get('operand')} {self.cache.get('target')[0]}"):
             clearCache()
 

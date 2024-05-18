@@ -12,6 +12,8 @@ class Timer:
     def reset(self):
         self.tracker = 0
 
+    def setTick(self, tick: int):
+        self.tracker = tick % self.mod
     @property
     def valid(self):
         return self.tracker == 0

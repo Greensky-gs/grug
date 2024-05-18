@@ -15,3 +15,6 @@ def horizontal(dir):
     return dir in ["left", "right"]
 def vertical(dir):
     return dir in ["up", "down"]
+
+def checkCollision(*, oxa, oya, oxb, oyb, wa, ha, wb, hb):
+    return oxa < oxb + wb and oya < oyb + hb and oxb < oxa + wa and oyb < oya + ha
