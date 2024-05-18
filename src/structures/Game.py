@@ -84,6 +84,8 @@ class Game:
         self.player.moveTo(*self.getcache("beforeCollide"))
         self.cache("beforeCollide")
 
+        self.player.resetPv()
+
     def cache(self, name, value = None):
         if value is None:
             if name in self._cache:
@@ -165,6 +167,7 @@ class Game:
 
             if self.player.jumping:
                 self.player.addJump(self.getcache("jumpTick"), self.tick, self.collisions["ground"].closest(self.player.x, self.player.y)[1])
+            self.player.hpBar()
         self.player.display()
 
         self.checkTriggers()

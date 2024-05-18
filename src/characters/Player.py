@@ -1,5 +1,5 @@
 from p5 import *
-from utils.config import renderModes, dev
+from utils.config import dev
 from methods.parsers import parsePos, parseDirection, horizontal
 from methods.paths import Pathing
 from structures.Timer import Timer
@@ -93,6 +93,9 @@ class Player:
 
         self.x, self.y = pos
 
+    def resetPv(self):
+        self.hp[0] = self.hp[1]
+        return self
     @property
     def pos(self):
         return (self.x, self.y)
@@ -122,7 +125,6 @@ class Player:
     def tickTexture(self):
         self.textures[self.textures["state"]]["counter"].tick()
 
-
     def hitbox(self, w, h):
         fill(255)
         rect(self.x, self.y, w, h)
@@ -143,8 +145,6 @@ class Player:
         image(img, img.width * coef, -img.height)
 
         popMatrix()
-
-        self.hpBar()
 
     def moveTo(self, x, y):
         self.x, self.y = parsePos(x, y)
