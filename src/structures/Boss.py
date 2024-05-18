@@ -6,7 +6,7 @@ class Boss:
     scene: str
     displayer: Callable[[Tuple[float, float], Tuple[float, float]], None]
 
-    # Format: [maxPV, currentPV]
+    # Format: [currentPV, maxPV]
     hp: Tuple[float, float]
 
     def __init__(self, *, name, scene, hp, pos) -> None:
@@ -20,3 +20,11 @@ class Boss:
 
     def display(self):
         self.displayer.display(self.pos, self.hp)
+    
+    @property
+    def dead(self):
+        return self.hp[0] <= 0
+
+    def damage(self, amount):
+        self.hp[0] = max(self.hp[0] - amount, 0)
+        return self.dead

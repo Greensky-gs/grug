@@ -1,6 +1,7 @@
 from structures.Boss import Boss
 from structures.Cache import Cache
 from characters.Player import Player
+from structures.Timer import Timer
 from typing import Any
 from utils.config import configs, dev
 from methods.parsers import parseDirection, parsePos
@@ -13,6 +14,7 @@ class Truck(Boss):
     cache = Cache()
     width = None
     height = None
+    deltaDamage = 2
 
     def __init__(self) -> None:
         super().__init__(name = "Truck", scene="truck", hp=100, pos = (800, 667))
@@ -22,7 +24,14 @@ class Truck(Boss):
         self.width = self.texture.width
         self.height = self.texture.height
 
+        self.cache.cache("damageTicker", Timer(60))
+
         def display():
+            self.cache.get("damageTicker").tick()
+
+            if self.cache.get("damageTicker").valid:
+                self.damage(self.deltaDamage)
+
             if dev:
                 fill(255)
                 rect(*self.pos, self.width, -self.height)
