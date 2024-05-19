@@ -29,6 +29,7 @@ class Game:
     bgCache = {}
     _cache = {}
     frameRate: int
+    ended = False
 
     def __init__(self):
         pass
@@ -145,6 +146,17 @@ class Game:
         fill(200, 200, 200, 200)
         rect(0, 0, configs["WIDTH"], configs["HEIGHT"])
     def display(self):
+        boss = self.getcache("boss")
+        if not not boss and boss.dead:
+            self.collisions["triggers"].removeKey(boss.scene)
+
+            self.resetBgIndex()
+            self.cache("boss")
+
+
+        if self.player.dead:
+            self.ended = True
+            return
         self.player.tickTexture()
 
         resetMatrix()

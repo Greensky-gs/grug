@@ -32,4 +32,19 @@ class Pathing:
             return None
         
         return self.paths[str(x)][str(y)]
+    def removeKey(self, key):
+        if self.mode != paths.Colliders:
+            raise AttributeError("Il n'est possible de supprimer des clés que dans le mode 'Collider'")
+        
+        xList = list(self.paths.keys())
+        for x in xList:
+            if not x in self.paths:
+                continue
+            yList = list(self.paths[x].keys())
+
+            for y in yList:
+                if not y in self.paths[x]:
+                    continue
+                if self.paths[x][y] == key:
+                    del self.paths[x][y]
     

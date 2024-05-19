@@ -117,7 +117,7 @@ class Truck(Boss):
             if checkCollision(oxa=self.x, oya=self.y, oxb=player.x, oyb=player.y, wa=self.width, ha=self.height, wb=player.width, hb=player.height):
                 self.cache.get("damager").tick()
                 if self.cache.get("damager").valid:
-                    player.damage(3)
+                    player.damage(8)
                     game.startJump([2.6, 0.8, 1.7])
 
         if eval(f"{self.pos[0]} {self.cache.get('operand')} {self.cache.get('target')[0]}"):
