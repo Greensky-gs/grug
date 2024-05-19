@@ -18,7 +18,6 @@ def draw():
 
         if loader.ready and key_is_pressed:
             loader.end()
-
         return
 
     if not game.ready:
