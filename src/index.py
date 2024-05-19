@@ -1,15 +1,26 @@
 from utils.config import configs, renderModes
 from p5 import *
 from structures.Game import Game
+from structures.Loader import Loader
 
 game = Game()
+loader = Loader()
 
 def setup():
     size(configs["WIDTH"], configs["HEIGHT"])
 
     game.setup()
+    loader.load()
 
 def draw():
+    if not loader.ended:
+        loader.display()
+
+        if loader.ready and key_is_pressed:
+            loader.end()
+
+        return
+
     if not game.ready:
         return
 
