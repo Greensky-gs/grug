@@ -21,6 +21,7 @@ class Game:
     }
     ready = False
     paused = False
+    loading = True
     tickerRef: int
     render = renderModes.UP
     bosses = Bosses()
@@ -34,6 +35,32 @@ class Game:
     def __init__(self):
         pass
     
+    def reset(self):
+        self.loading = True
+        self.ready = False
+
+        self.cache("endTick")
+
+        self.player.reset()
+
+        self.grugSprite = grug.Grug(x = self.player.x, y = self.player.y)
+
+        self.player.moveTo(40, 716)
+        self.grugSprite.moveTo(*self.player.grugPos("right"))
+
+        self.bosses.load()
+
+        self.tickerRef = monotonic()
+        self.ready = True
+        self.ended = False
+        self.paused = False
+        self.render = renderModes.UP
+        self._cache = {}
+        self.bgIndex = None
+        self.mapIndex = 0
+
+        self.loading = False
+
     def setup(self):
         self.player = Player.Player()
         self.grugSprite = grug.Grug(x = self.player.x, y = self.player.y)
@@ -48,6 +75,7 @@ class Game:
         self.tickerRef = monotonic()
         self.bosses.load()
         self.ready = True
+        self.loading = False
 
         if dev:
             self.setBgIndex("truck")
@@ -153,10 +181,6 @@ class Game:
             self.resetBgIndex()
             self.cache("boss")
 
-
-        if self.player.dead:
-            self.ended = True
-            return
         self.player.tickTexture()
 
         resetMatrix()
@@ -189,6 +213,12 @@ class Game:
         self.player.display()
 
         self.checkTriggers()
+
+        
+        if self.player.dead:
+            self.ended = True
+            self.cache("endTick", self.tick)
+            return
 
     @property
     def tick(self):

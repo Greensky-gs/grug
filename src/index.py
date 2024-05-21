@@ -13,6 +13,8 @@ def setup():
     loader.load()
 
 def draw():
+    background(0)
+
     if not loader.ended:
         loader.display()
 
@@ -21,6 +23,13 @@ def draw():
         return
 
     if not game.ready:
+        return
+
+    if game.player.dead or not game.ready:
+        loader.lostScreen()
+
+        if game.tick - game.getcache("endTick", -100) > 3 and key_is_pressed and not game.loading:
+            game.reset()
         return
 
     # Gère mouvements du joueur

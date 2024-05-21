@@ -51,7 +51,22 @@ class Player:
 
         self.textures["jump"]["textures"].append(loadImage("./src/assets/sprites/player/jump/0.png"))
         self.textures["idle"]["textures"].append(loadImage("./src/assets/sprites/player/idle/0.png"))
-            
+    
+    def reset(self):
+        self.x = 0
+        self.y = 0
+
+        self.jumping = False
+        self.shifting = False
+        self.hp = [self.hp[1], self.hp[1]]
+        self.lastDir = "right"
+
+        self.textures["state"] = "idle"
+        for key in self.textures:
+            if key == "state":
+                continue
+            self.textures[key]["counter"].reset()
+
     def setTextureState(self, state):
         if state == self.textures["state"]:
             return

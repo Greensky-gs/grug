@@ -9,6 +9,7 @@ class Loader:
     img = None
     banner = None
     font = None
+    lost = None
     ready = False
     clock = 0
 
@@ -18,6 +19,7 @@ class Loader:
     def load(self):
         self.img = loadImage("./src/assets/welcome.png")
         self.banner = loadImage("./src/assets/banner.png")
+        self.lost = loadImage("./src/assets/lost.png")
 
         self.font = loadFont("./src/assets/fonts/Jaini-Regular.ttf")
 
@@ -52,8 +54,15 @@ class Loader:
             return self
         if self.img:
             del self.img
-        if self.font:
-            del self.font
         if self.banner:
             del self.banner
         self.ended = True
+    def lostScreen(self):
+        image(self.lost, 0, 0)
+
+        message = "Appuyez sur une touche pour recommencer..."
+
+        fill(250, 101, 120)
+        text_font(self.font)
+        textSize(45)
+        text(message, configs["WIDTH"] / 2 - (len(message) / 2) * 15, configs["HEIGHT"] / 2 - 22)
