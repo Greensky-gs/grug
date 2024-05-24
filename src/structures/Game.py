@@ -169,7 +169,8 @@ class Game:
 
     def pauseScreen(self):
         self.grugSprite.display()
-        self.player.display()
+        if self.render == renderModes.FACE:
+            self.player.display()
 
         fill(200, 200, 200, 200)
         rect(0, 0, configs["WIDTH"], configs["HEIGHT"])
