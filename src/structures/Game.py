@@ -78,7 +78,7 @@ class Game:
         self.loading = False
 
         if dev:
-            self.setBgIndex("truck")
+            self.setBgIndex("guitar")
            
     def pause(self):
         self.paused = True
