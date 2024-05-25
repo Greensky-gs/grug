@@ -55,6 +55,7 @@ class Guitar(Boss):
     width = None
     height = None
     deltaDamage = 2
+    deltaV = 7
 
     def __init__(self) -> None:
         super().__init__(name = "Guitare", scene="guitar", hp=70, pos = (800, 698))
@@ -131,7 +132,32 @@ class Guitar(Boss):
     def dead(self):
         return self.hp[0] <= 0
     def setPos(self, player: Player, game, tick: int):
-        pass
+        okTick = self.cache.get("okTick")
+        if not not okTick and tick < okTick:
+            return
+        self.cache.delete("okTick")
+
+        target = self.cache.get("target")
+
+        if not target:
+            target = (player.x, self.pos[1])
+            self.cache.cache("target", target)
+        
+        current = list(self.pos).copy()
+        if self.pos[0] < target[0]:
+            current[0] += self.deltaV
+            self.lastDir = "right"
+        elif self.pos[0] > target[0]:
+            current[0] -= self.deltaV
+            self.lastDir = "left"
+        
+        
+        if abs(self.pos[0] - target[0]) <= 0.2 * self.width:
+            self.cache.delete("target")
+            okTick = tick + randint(1, 3)
+            self.cache.cache("okTick", okTick)
+
+        self.pos = tuple(current)
     def move(self, player: Player, game, tick: int):
         self.tickAttack(player, tick)
         self.setPos(player, game, tick)
