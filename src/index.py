@@ -18,7 +18,7 @@ def draw():
     if not loader.ended:
         loader.display()
 
-        if loader.ready and key_is_pressed:
+        if loader.ready and (key_is_pressed or mouse_is_pressed): 
             loader.end()
         return
 
@@ -28,7 +28,7 @@ def draw():
     if game.player.dead or not game.ready:
         loader.lostScreen()
 
-        if game.tick - game.getcache("endTick", -100) > 3 and key_is_pressed and not game.loading:
+        if game.tick - game.getcache("endTick", -100) > 3 and (key_is_pressed or mouse_is_pressed) and not game.loading:
             game.reset()
         return
 
