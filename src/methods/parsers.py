@@ -1,9 +1,12 @@
 from utils.config import configs
 from typing import Literal
+from random import randint
+
+DirectionType = Literal["up", "down", "left", "right"]
 
 def parsePos(x, y, *, aw = 0):
     return (max(0, min(x, configs["WIDTH"] - (20 + aw))), max(0, min(y, configs["HEIGHT"] - 20)))
-def parseDirection(x, y) -> Literal["up", "down", "left", "right"]:
+def parseDirection(x, y) -> DirectionType:
     lastDir = None
     if x != 0:
         lastDir = "left" if x < 0 else "right"
@@ -11,10 +14,16 @@ def parseDirection(x, y) -> Literal["up", "down", "left", "right"]:
         lastDir = "up" if y < 0 else "down"
     
     return lastDir
-def horizontal(dir):
-    return dir in ["left", "right"]
-def vertical(dir):
-    return dir in ["up", "down"]
+def horizontal(direction: DirectionType) -> bool:
+    return direction in ["left", "right"]
+
+def vertical(direction: DirectionType) -> bool:
+    return direction in ["up", "down"]
+def oppositeDirection(direction: DirectionType) -> DirectionType:
+    return "left" if direction == "right" else "right" if direction == "left" else "up" if direction == "down" else "down"
+def randomDirection(excludedDirections: list[DirectionType] = []):
+    directions = list(filter(lambda x: not x in excludedDirections, ["up", "down", "left", "right"]))
+    return directions[randint(0, len(directions) - 1)]
 
 def checkCollision(*, oxa, oya, oxb, oyb, wa, ha, wb, hb):
     return oxa < oxb + wb and oya < oyb + hb and oxb < oxa + wa and oyb < oya + ha

@@ -1,6 +1,7 @@
 from json import load
 from typing import Dict, List
 from utils.config import paths
+from pprint import pprint
 
 class Pathing:
     paths: Dict[str, List[int]] = {}
@@ -36,6 +37,7 @@ class Pathing:
         if self.mode != paths.Colliders:
             raise AttributeError("Il n'est possible de supprimer des clés que dans le mode 'Collider'")
         
+        pprint(self.paths)    
         xList = list(self.paths.keys())
         for x in xList:
             if not x in self.paths:
@@ -45,6 +47,8 @@ class Pathing:
             for y in yList:
                 if not y in self.paths[x]:
                     continue
+                print(self.paths[x][y])
                 if self.paths[x][y] == key:
                     del self.paths[x][y]
+        pprint(self.paths)
     
