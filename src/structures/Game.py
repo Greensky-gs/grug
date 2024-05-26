@@ -25,6 +25,8 @@ class Game:
     tickerRef: int
     render = renderModes.UP
     bosses = Bosses()
+    defeated = 0
+    win = False
 
     # Système de cache pour les arrières-plans
     bgCache = {}
@@ -58,6 +60,8 @@ class Game:
         self._cache = {}
         self.bgIndex = None
         self.mapIndex = 0
+        self.defeated = 0
+        self.win = False
 
         self.loading = False
 
@@ -181,6 +185,13 @@ class Game:
 
             self.resetBgIndex()
             self.cache("boss")
+
+            self.defeated += 1
+            if self.defeated == len(self.bosses):
+                self.ended = True
+                self.win = True
+                self.cache("endTick", self.tick)
+                return
 
         self.player.tickTexture()
 

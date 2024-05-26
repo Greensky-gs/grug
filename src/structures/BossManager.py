@@ -7,6 +7,8 @@ class Bosses:
 
     def __init__(self) -> None:
         self.bosses = {}
+    def __len__(self) -> int:
+        return len(self.bosses)
     
     def load(self):
         self.bosses["truck"] = Truck()

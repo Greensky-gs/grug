@@ -22,6 +22,9 @@ def draw():
             loader.end()
         return
 
+    if game.win:
+        loader.win()
+        return
     if not game.ready:
         return
 

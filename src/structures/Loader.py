@@ -8,6 +8,7 @@ class Loader:
     step = "prod"
     img = None
     banner = None
+    winImg = None
     font = None
     lost = None
     ready = False
@@ -20,9 +21,12 @@ class Loader:
         self.img = loadImage("./src/assets/welcome.png")
         self.banner = loadImage("./src/assets/banner.png")
         self.lost = loadImage("./src/assets/lost.png")
+        self.winImg = loadImage("./src/assets/win_screen.png")
 
         self.font = loadFont("./src/assets/fonts/Jaini-Regular.ttf")
 
+    def win(self):
+        image(self.winImg, 0, 0)
     def display(self):
         self.clock += 1
 
