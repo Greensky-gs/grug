@@ -56,6 +56,7 @@ class Guitar(Boss):
     height = None
     deltaDamage = 2
     deltaV = 7
+    evolved = False
 
     def __init__(self) -> None:
         super().__init__(name = "Guitare", scene="guitar", hp=70, pos = (800, 698))
@@ -84,6 +85,12 @@ class Guitar(Boss):
 
         self.setdisplay(display)
     
+    def damage(self, damage: int):
+        self.hp[0] -= damage
+        if self.hp[0] <= 0:
+            self.hp[0] = 0
+        if self.hp[0] <= 0.5 * self.hp[1]:
+            self.evolve()
     def hpBar(self):
         width = 320
         outline = 5
@@ -123,11 +130,16 @@ class Guitar(Boss):
 
             if tick - attack.creation > 1 and checkCollision(oxa=self.pos[0], oya=self.pos[1] - self.height, wa=self.width, ha=self.height, oxb=attack.pos[0], oyb=attack.pos[1], wb=attack.width, hb=attack.height):
                 self.cache.delete("attack")
-                self.hp[0] -= attack.damage
+                self.damage(attack.damage)
             if checkCollision(oxa=player.x, oya=player.y - player.height, wa=player.width, ha=player.height, oxb=attack.pos[0], oyb=attack.pos[1], wb=attack.width, hb=attack.height):
                 player.damage(attack.damage)
                 self.cache.delete("attack")
     
+    def evolve(self):
+        if not self.evolved:
+            self.deltaV = int(self.deltaV * 1.5)
+            self.evolved = True
+
     @property
     def dead(self):
         return self.hp[0] <= 0
