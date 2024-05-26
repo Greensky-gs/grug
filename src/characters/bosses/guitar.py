@@ -14,7 +14,7 @@ class GuitarAttack:
     pos = [0, 0]
     texture: Any
     width = randint(50, 100)
-    height = randint(80, 160)
+    height = randint(80, 145)
     damage = randint(3, 5)
     deltaV = randint(5, 10)
     creation: int
@@ -151,8 +151,7 @@ class Guitar(Boss):
             current[0] -= self.deltaV
             self.lastDir = "left"
         
-        
-        if abs(self.pos[0] - target[0]) <= 0.2 * self.width:
+        if abs(self.pos[0] - target[0]) <= self.width:
             self.cache.delete("target")
             okTick = tick + randint(1, 3)
             self.cache.cache("okTick", okTick)
