@@ -9,17 +9,25 @@ from structures.Timer import Timer
 from characters.Player import Player
 
 class GuitarAttack:
-    direction: DirectionType
-    # Position à partir d'en haut à gauche
-    pos = [0, 0]
-    texture: Any
-    width = randint(50, 100)
-    height = randint(80, 145)
-    damage = randint(3, 5)
-    deltaV = randint(5, 10)
-    creation: int
+    direction: DirectionType  # Direction de l'attaque
+    pos = [0, 0]  # Position de l'attaque (en haut à gauche)
+    texture: Any  # Texture de l'attaque
+    width = randint(50, 100)  # Largeur de l'attaque (aléatoire entre 50 et 100)
+    height = randint(80, 145)  # Hauteur de l'attaque (aléatoire entre 80 et 145)
+    damage = randint(3, 5)  # Dommages de l'attaque (aléatoire entre 3 et 5)
+    deltaV = randint(5, 10)  # Vitesse de déplacement de l'attaque (aléatoire entre 5 et 10)
+    creation: int  # Instant de création de l'attaque
 
     def __init__(self, *, direction: DirectionType, pos = [0, 0], ground: int, tick: int) -> None:
+        """
+        Initialise une instance de l'attaque de guitare.
+
+        Args:
+            direction (DirectionType): La direction de l'attaque.
+            pos (List[int], optional): La position de l'attaque. Defaults to [0, 0].
+            ground (int): La position au sol de l'attaque.
+            tick (int): L'instant de création de l'attaque.
+        """
         self.direction = direction
         self.pos = pos
         self.creation = tick
@@ -30,6 +38,9 @@ class GuitarAttack:
 
     
     def display(self):
+        """
+        Affiche l'attaque de guitare à l'écran.
+        """
         pushMatrix()
 
         translate(*self.pos)
@@ -39,6 +50,9 @@ class GuitarAttack:
         popMatrix()
 
     def move(self):
+        """
+        Déplace l'attaque de guitare en fonction de sa direction.
+        """
         if self.direction == "right":
             self.pos[0] += self.deltaV
         else:
@@ -49,16 +63,19 @@ class GuitarAttack:
             self.direction = oppositeDirection(self.direction)
 
 class Guitar(Boss):
-    texture: Any
-    lastDir = "left"
-    cache = Cache()
-    width = None
-    height = None
-    deltaDamage = 2
-    deltaV = 7
-    evolved = False
+    texture: Any  # Texture de la guitare
+    lastDir = "left"  # Dernière direction de déplacement de la guitare
+    cache = Cache()  # Cache pour stocker des données temporaires
+    width = None  # Largeur de la guitare
+    height = None  # Hauteur de la guitare
+    deltaDamage = 2  # Variation des dommages infligés par la guitare
+    deltaV = 7  # Vitesse de déplacement de la guitare
+    evolved = False  # Indicateur d'évolution de la guitare
 
     def __init__(self) -> None:
+        """
+        Initialise une instance du boss Guitar.
+        """
         super().__init__(name = "Guitare", scene="guitar", hp=70, pos = (800, 698))
 
         self.texture = loadImage("src/assets/sprites/bosses/guitar/guitar.png")
@@ -67,6 +84,9 @@ class Guitar(Boss):
         self.height = self.texture.height
 
         def display():
+            """
+            Affiche la guitare à l'écran.
+            """
             pushMatrix()
 
             translate(*self.pos)
@@ -86,12 +106,22 @@ class Guitar(Boss):
         self.setdisplay(display)
     
     def damage(self, damage: int):
+        """
+        Inflige des dommages à la guitare.
+
+        Args:
+            damage (int): Les dommages à infliger.
+        """
         self.hp[0] -= damage
         if self.hp[0] <= 0:
             self.hp[0] = 0
         if self.hp[0] <= 0.5 * self.hp[1]:
             self.evolve()
+    
     def hpBar(self):
+        """
+        Affiche la barre de vie de la guitare.
+        """
         width = 320
         outline = 5
         height = 15
@@ -108,7 +138,15 @@ class Guitar(Boss):
 
         fill(255, 0, 0)
         rect(ox + outline, oy + outline, max(0, width * (self.hp[0] / self.hp[1])), height)
+    
     def tickAttack(self, player: Player, tick: int):
+        """
+        Gère l'attaque de la guitare à chaque tick.
+
+        Args:
+            player (Player): Le joueur.
+            tick (int): Le tick actuel.
+        """
         if not self.cache.get("attack"):
             timer = self.cache.get("beforeAttack")
             if not timer:
@@ -136,14 +174,32 @@ class Guitar(Boss):
                 self.cache.delete("attack")
     
     def evolve(self):
+        """
+        Fait évoluer la guitare.
+        """
         if not self.evolved:
             self.deltaV = int(self.deltaV * 1.5)
             self.evolved = True
 
     @property
     def dead(self):
+        """
+        Vérifie si la guitare est morte.
+
+        Returns:
+            bool: True si la guitare est morte, False sinon.
+        """
         return self.hp[0] <= 0
+    
     def setPos(self, player: Player, game, tick: int):
+        """
+        Définit la position de la guitare en fonction du joueur.
+
+        Args:
+            player (Player): Le joueur.
+            game: Le jeu.
+            tick (int): Le tick actuel.
+        """
         okTick = self.cache.get("okTick")
         if not not okTick and tick < okTick:
             return
@@ -169,7 +225,16 @@ class Guitar(Boss):
             self.cache.cache("okTick", okTick)
 
         self.pos = tuple(current)
+    
     def move(self, player: Player, game, tick: int):
+        """
+        Gère le mouvement de la guitare.
+
+        Args:
+            player (Player): Le joueur.
+            game: Le jeu.
+            tick (int): Le tick actuel.
+        """
         self.tickAttack(player, tick)
         self.setPos(player, game, tick)
 

@@ -11,33 +11,36 @@ from structures.BossManager import Bosses
 from pprint import pprint
 
 class Game:
-    player: Player.Player
-    grugSprite: grug.Grug
-    mapIndex = 0
-    bgIndex = None
+    player: Player.Player  # Instance of the Player class
+    grugSprite: grug.Grug  # Instance of the grug.Grug class
+    mapIndex = 0  # Index of the current map
+    bgIndex = None  # Index of the current background
     collisions = {
-        "paths": Pathing(f"./src/data/paths.json", paths.Paths),
-        "triggers": Pathing(f"./src/data/triggers.json", paths.Colliders)
+        "paths": Pathing(f"./src/data/paths.json", paths.Paths),  # Collision paths
+        "triggers": Pathing(f"./src/data/triggers.json", paths.Colliders)  # Collision triggers
     }
-    ready = False
-    paused = False
-    loading = True
-    tickerRef: int
-    render = renderModes.UP
-    bosses = Bosses()
-    defeated = 0
-    win = False
+    ready = False  # Flag indicating if the game is ready to be played
+    paused = False  # Flag indicating if the game is paused
+    loading = True  # Flag indicating if the game is currently loading
+    tickerRef: int  # Reference time for calculating tick
+    render = renderModes.UP  # Rendering mode
+    bosses = Bosses()  # Instance of the Bosses class
+    defeated = 0  # Number of defeated bosses
+    win = False  # Flag indicating if the player has won the game
 
-    # Système de cache pour les arrières-plans
-    bgCache = {}
-    _cache = {}
-    frameRate: int
-    ended = False
+    # Cache system for backgrounds
+    bgCache = {}  # Dictionary to store cached backgrounds
+    _cache = {}  # Dictionary to store general cache
+    frameRate: int  # Frame rate of the game
+    ended = False  # Flag indicating if the game has ended
 
     def __init__(self):
         pass
-    
+
     def reset(self):
+        """
+        Reset the game to its initial state.
+        """
         self.loading = True
         self.ready = False
 
@@ -45,7 +48,7 @@ class Game:
 
         self.player.reset()
 
-        self.grugSprite = grug.Grug(x = self.player.x, y = self.player.y)
+        self.grugSprite = grug.Grug(x=self.player.x, y=self.player.y)
 
         self.player.moveTo(40, 716)
         self.grugSprite.moveTo(*self.player.grugPos("right"))
@@ -66,8 +69,11 @@ class Game:
         self.loading = False
 
     def setup(self):
+        """
+        Set up the game.
+        """
         self.player = Player.Player()
-        self.grugSprite = grug.Grug(x = self.player.x, y = self.player.y)
+        self.grugSprite = grug.Grug(x=self.player.x, y=self.player.y)
 
         self.player.moveTo(40, 716)
         self.grugSprite.moveTo(*self.player.grugPos("right"))
@@ -83,22 +89,32 @@ class Game:
 
         if dev:
             self.setBgIndex("guitar")
-           
+
     def pause(self):
+        """
+        Pause the game.
+        """
         self.paused = True
         self.cache("pauseTick", self.tick)
+
     def resume(self):
+        """
+        Resume the game.
+        """
         self.paused = False
         self.cache("pauseTick", self.tick)
 
     def setBgIndex(self, name):
+        """
+        Set the background index.
+        """
         if name is None:
             self.cache("boss")
-        
+
         boss = self.bosses.getBoss(name)
         if not boss:
             return
-        
+
         self.cache("boss", boss)
 
         self.bgIndex = name
@@ -108,7 +124,11 @@ class Game:
 
         self.cache("beforeCollide", self.player.pos)
         self.player.moveTo(20, self.collisions["ground"].closest(self.player.x, self.player.y)[1])
+
     def resetBgIndex(self):
+        """
+        Reset the background index.
+        """
         self.bgIndex = None
         self.collisions.pop("ground")
         self.render = renderModes.UP
@@ -119,23 +139,37 @@ class Game:
 
         self.player.resetPv()
 
-    def cache(self, name, value = None):
+    def cache(self, name, value=None):
+        """
+        Cache a value.
+        """
         if value is None:
             if name in self._cache:
                 self._cache.pop(name)
             return self._cache
         self._cache[name] = value
         return value
-    def getcache(self, name, default = None):
+
+    def getcache(self, name, default=None):
+        """
+        Get a cached value.
+        """
         return self._cache.get(name, default)
-    def startJump(self, coefs = None):
+
+    def startJump(self, coefs=None):
+        """
+        Start the player's jump.
+        """
         self.player.setTextureState("jump")
         self.cache("jumpCoefs", coefs)
 
         self.player.jumping = True
         self.cache("jumpTick", self.tick)
 
-    def movePlayer(self, *, x = 0, y = 0, moving = False):
+    def movePlayer(self, *, x=0, y=0, moving=False):
+        """
+        Move the player.
+        """
         if not self.player.jumping:
             if moving:
                 self.player.setTextureState(self.playerMoveTexture)
@@ -147,7 +181,7 @@ class Game:
         if self.render == renderModes.FACE:
             y = 0
         self.player.move(x, y, paths=self.collisions["paths" if self.render == renderModes.UP else "ground"])
-        
+
         lastDir = parseDirection(x, y)
 
         if horizontal(lastDir):
@@ -156,6 +190,9 @@ class Game:
         self.grugSprite.moveTo(*self.player.grugPos(self.grugSprite.lastDirection))
 
     def bgCaching(self):
+        """
+        Cache the background.
+        """
         key = self.bgIndex if not self.bgIndex is None else self.mapIndex
         path = f"./src/assets/maps/{self.mapIndex}.jpg" if self.bgIndex is None else f"./src/assets/bg/{self.bgIndex}.jpg"
 
@@ -165,20 +202,31 @@ class Game:
 
             return bg
         return self.bgCache[key]
+
     def checkTriggers(self):
+        """
+        Check collision triggers.
+        """
         if self.collisions["triggers"].inPath(self.player.x, self.player.y):
             scene = self.collisions["triggers"].getId(self.player.x, self.player.y)
 
             self.setBgIndex(scene)
 
     def pauseScreen(self):
+        """
+        Display the pause screen.
+        """
         self.grugSprite.display()
         if self.render == renderModes.FACE:
             self.player.display()
 
         fill(200, 200, 200, 200)
         rect(0, 0, configs["WIDTH"], configs["HEIGHT"])
+
     def display(self):
+        """
+        Display the game.
+        """
         boss = self.getcache("boss")
         if not not boss and boss.dead:
             self.collisions["triggers"].removeKey(boss.scene)
@@ -226,7 +274,6 @@ class Game:
 
         self.checkTriggers()
 
-        
         if self.player.dead:
             self.ended = True
             self.cache("endTick", self.tick)
@@ -234,9 +281,15 @@ class Game:
 
     @property
     def tick(self):
+        """
+        Calculate the tick.
+        """
         now = monotonic()
         return now - self.tickerRef
-    
+
     @property
     def playerMoveTexture(self):
+        """
+        Get the player's move texture.
+        """
         return "walk" if self.render == renderModes.UP else "sprint"
